@@ -1,0 +1,18 @@
+# This is a sample build configuration for Javascript.
+# Check our guides at https://confluence.atlassian.com/x/VYk8Lw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:7.3.0
+
+pipelines:
+  default:
+    - step:
+        script:
+          - npm install
+          # authenticate with snyk
+          - node node_modules/snyk/cli auth ${SNYK_TOKEN} -d
+          # snyk test will run as part of npm test and fail if it finds vulnerabilities
+          - npm test
+          # snyk monitor updates the dependencies Snyk will monitor for new vulnerabilities
+          - if [ $BITBUCKET_BRANCH == "master" ]; then node node_modules/snyk/cli monitor; fi; 
